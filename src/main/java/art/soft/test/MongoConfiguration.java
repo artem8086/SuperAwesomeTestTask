@@ -1,7 +1,7 @@
 package art.soft.test;
 
-import art.soft.test.models.Post;
-import art.soft.test.models.User;
+import art.soft.test.model.Post;
+import art.soft.test.model.User;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;

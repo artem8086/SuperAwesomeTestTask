@@ -1,9 +1,8 @@
-package art.soft.test.models;
+package art.soft.test.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
@@ -24,8 +23,7 @@ public class User {
     private boolean isAdmin;
     private boolean isActive = true;
 
-    @DBRef
-    private Set<User> subscribes = new HashSet<User>();
+    private Set<UserSubscribe> subscribes = new HashSet<UserSubscribe>();
 
     public User() {}
 
@@ -86,7 +84,7 @@ public class User {
         return roles;
     }
 
-    public Set<User> getSubscribes() {
+    public Set<UserSubscribe> getSubscribes() {
         return subscribes;
     }
 

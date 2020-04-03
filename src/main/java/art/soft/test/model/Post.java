@@ -1,5 +1,6 @@
-package art.soft.test.models;
+package art.soft.test.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -21,10 +22,15 @@ public class Post {
     @DBRef
     private User owner;
 
-    public Post(String title, String content, Date date) {
+    public Post(String title, String content, User owner) {
         this.title = title;
         this.content = content;
-        this.date = date;
+        this.date = new Date();
+        this.owner = owner;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -51,11 +57,16 @@ public class Post {
         this.date = date;
     }
 
+    @JsonIgnore
     public User getOwner() {
         return owner;
     }
 
     public void setOwner(User owner) {
         this.owner = owner;
+    }
+
+    public String getUsername() {
+        return owner.getLogin();
     }
 }

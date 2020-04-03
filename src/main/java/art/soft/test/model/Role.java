@@ -1,4 +1,4 @@
-package art.soft.test.models;
+package art.soft.test.model;
 
 import org.springframework.security.core.GrantedAuthority;
 
