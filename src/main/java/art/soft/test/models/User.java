@@ -1,12 +1,15 @@
 package art.soft.test.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Document
 public class User {
@@ -19,10 +22,10 @@ public class User {
     private String email;
     private String password;
     private boolean isAdmin;
-    private boolean isActive;
+    private boolean isActive = true;
 
     @DBRef
-    private List<User> subscribes;
+    private Set<User> subscribes = new HashSet<User>();
 
     public User() {}
 
@@ -65,10 +68,6 @@ public class User {
         return isAdmin;
     }
 
-    public void setAdmin(boolean admin) {
-        isAdmin = admin;
-    }
-
     public boolean isActive() {
         return isActive;
     }
@@ -77,7 +76,30 @@ public class User {
         isActive = active;
     }
 
-    public List<User> getSubscribes() {
+    @JsonIgnore
+    public List<Role> getRoles() {
+        ArrayList<Role> roles = new ArrayList<Role>();
+        roles.add(Role.ROLE_CLIENT);
+        if (isAdmin) {
+            roles.add(Role.ROLE_CLIENT);
+        }
+        return roles;
+    }
+
+    public Set<User> getSubscribes() {
         return subscribes;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof User)) return false;
+        User u = (User) o;
+        return id.equals(u.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }
