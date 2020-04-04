@@ -1,14 +1,17 @@
 package art.soft.test.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Document
 public class User {
@@ -17,13 +20,16 @@ public class User {
 
     @Indexed(unique = true)
     private String login;
+
     @Indexed(unique = true)
     private String email;
+
     private String password;
     private boolean isAdmin;
     private boolean isActive = true;
 
-    private Set<UserSubscribe> subscribes = new HashSet<UserSubscribe>();
+    @DBRef
+    private Set<User> subscribes = new HashSet<User>();
 
     public User() {}
 
@@ -54,6 +60,7 @@ public class User {
         this.email = email;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
@@ -84,8 +91,18 @@ public class User {
         return roles;
     }
 
-    public Set<UserSubscribe> getSubscribes() {
+    @JsonIgnore
+    public Set<User> getSubscribes() {
         return subscribes;
+    }
+
+    @JsonIgnore
+    public List<com.mongodb.DBRef> getSubsRef() {
+        return subscribes.stream().map(u -> new com.mongodb.DBRef("user", new ObjectId(u.id))).collect(Collectors.toList());
+    }
+
+    public List<String> getSubs() {
+        return subscribes.stream().map(u -> u.login).collect(Collectors.toList());
     }
 
     @Override

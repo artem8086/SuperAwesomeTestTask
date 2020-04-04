@@ -1,6 +1,6 @@
 package art.soft.test.config;
 import art.soft.test.model.User;
-import art.soft.test.model.UserRepository;
+import art.soft.test.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

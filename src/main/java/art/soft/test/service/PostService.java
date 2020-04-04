@@ -2,7 +2,7 @@ package art.soft.test.service;
 
 import art.soft.test.exception.CustomException;
 import art.soft.test.model.Post;
-import art.soft.test.model.PostRepository;
+import art.soft.test.repository.PostRepository;
 import art.soft.test.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -29,7 +29,7 @@ public class PostService {
         } catch (NoSuchElementException e) {
             throw new CustomException("Post not found!", HttpStatus.NOT_FOUND);
         }
-        if (!post.getOwner().equals(user)) {
+        if (!user.isAdmin() && !post.getOwner().equals(user)) {
             throw new CustomException("This post doesn't belong to you!", HttpStatus.UNPROCESSABLE_ENTITY);
         }
         if (title != null) post.setTitle(title);
@@ -45,14 +45,31 @@ public class PostService {
         } catch (NoSuchElementException e) {
             throw new CustomException("Post not found!", HttpStatus.NOT_FOUND);
         }
-        if (!post.getOwner().equals(user)) {
+        if (!user.isAdmin() && !post.getOwner().equals(user)) {
             throw new CustomException("This post doesn't belong to you!", HttpStatus.UNPROCESSABLE_ENTITY);
         }
         postRepository.delete(post);
         return post;
     }
 
+    public List<Post> getAllPosts() {
+        return postRepository.findAll();
+    }
+
     public List<Post> getUserPosts(User user) {
-        return postRepository.findByOwner(user, Sort.by(Sort.Direction.DESC, "date"));
+        return postRepository.findByOwner(user, Sort.by(Sort.Direction.ASC, "Date"));
+    }
+
+    public List<Post> getUserFeed(User user) {
+        return postRepository.findBySubsribers(
+                user.getSubsRef(),
+                Sort.by(Sort.Direction.ASC, "Date"));
+    }
+
+    public List<Post> findInFeedByTitle(User user, String title) {
+        return postRepository.findBySubsribersWithTitle(
+                user.getSubsRef(),
+                title,
+                Sort.by(Sort.Direction.ASC, "Date"));
     }
 }

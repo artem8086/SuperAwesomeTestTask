@@ -35,8 +35,8 @@ public class JwtTokenProvider {
     @Value("${security.jwt.token.secret-key:secret-key}")
     private String secretKey;
 
-//    @Value("${security.jwt.token.expire-length:3600000}")
-//    private long validityInMilliseconds = 3600000; // 1h
+    @Value("${security.jwt.token.expire-length:3600000}")
+    private long validityInMilliseconds = 3600000; // 1h
 
     @Autowired
     private MyUserDetails myUserDetails;
@@ -52,12 +52,12 @@ public class JwtTokenProvider {
         //claims.put("auth", new SimpleGrantedAuthority(role));
 
         Date now = new Date();
-        //Date validity = new Date(now.getTime() + validityInMilliseconds);
+        Date validity = new Date(now.getTime() + validityInMilliseconds);
 
         return Jwts.builder()//
                 .setClaims(claims)//
                 .setIssuedAt(now)//
-                //.setExpiration(validity)//
+                .setExpiration(validity)//
                 .signWith(SignatureAlgorithm.HS256, secretKey)//
                 .compact();
     }
@@ -72,9 +72,9 @@ public class JwtTokenProvider {
     }
 
     public String resolveToken(HttpServletRequest req) {
-        String bearerToken = req.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+        String token = req.getHeader("Authorization");
+        if (token != null && token.startsWith("Token ")) {
+            return token.substring(6);
         }
         return null;
     }

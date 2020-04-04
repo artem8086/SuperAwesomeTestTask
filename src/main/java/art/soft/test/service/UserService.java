@@ -3,6 +3,8 @@ package art.soft.test.service;
 import art.soft.test.config.JwtTokenProvider;
 import art.soft.test.exception.CustomException;
 import art.soft.test.model.*;
+import art.soft.test.repository.PostRepository;
+import art.soft.test.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,9 @@ import java.util.stream.Collectors;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PostRepository postRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -64,7 +69,7 @@ public class UserService {
         return userRepository.findAll().stream().map(u -> new UserInfo(u)).collect(Collectors.toList());
     }
 
-    public List<User> getAdminUsers() {
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
@@ -87,8 +92,7 @@ public class UserService {
         if (userCur.equals(userSub)) {
             throw new CustomException("You can't subscribe on yourself!", HttpStatus.UNPROCESSABLE_ENTITY);
         }
-
-        if (userCur.getSubscribes().add(new UserSubscribe(userSub))) {
+        if (userCur.getSubscribes().add(userSub)) {
             userRepository.save(userCur);
         } else {
             throw new CustomException("You already subscribe on " + userSub.getLogin() + "!", HttpStatus.UNPROCESSABLE_ENTITY);
@@ -102,12 +106,30 @@ public class UserService {
         if (userCur.equals(userSub)) {
             throw new CustomException("You can't subscribe on yourself!", HttpStatus.UNPROCESSABLE_ENTITY);
         }
-
         if (userCur.getSubscribes().remove(userSub)) {
             userRepository.save(userCur);
         } else {
-            throw new CustomException("You not subscribe on " + userSub.getLogin() + "!", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new CustomException("You already unsubscribe at " + userSub.getLogin() + "!", HttpStatus.UNPROCESSABLE_ENTITY);
         }
         return userSub;
+    }
+
+    public User modify(User user, String login, String email, String password, Boolean active) {
+        if (login != null) user.setLogin(login);
+        if (email != null) user.setEmail(email);
+        if (password != null) user.setPassword(passwordEncoder.encode(password));
+        if (active != null) user.setActive(active);
+        return userRepository.save(user);
+    }
+
+    public User delete(User user) {
+        postRepository.deleteAll(postRepository.findByOwner(user));
+        userRepository.delete(user);
+        userRepository.findAll().forEach(u -> {
+            if (u.getSubscribes().remove(user)) {
+                userRepository.save(u);
+            }
+        });
+        return user;
     }
 }

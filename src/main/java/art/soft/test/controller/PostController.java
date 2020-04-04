@@ -1,6 +1,7 @@
 package art.soft.test.controller;
 
 import art.soft.test.model.Post;
+import art.soft.test.model.User;
 import art.soft.test.service.PostService;
 import art.soft.test.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,5 +44,20 @@ public class PostController {
     @GetMapping("/my")
     public List<Post> myPosts(HttpServletRequest req) {
         return postService.getUserPosts(userService.whoami(req));
+    }
+
+    @GetMapping("/feed")
+    public List<Post> getFeed(HttpServletRequest req, @RequestParam(required = false) String title) {
+        if (title == null) {
+            return postService.getUserFeed(userService.whoami(req));
+        } else {
+            return postService.findInFeedByTitle(userService.whoami(req), title);
+        }
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public List<Post> getAllPosts() {
+        return postService.getAllPosts();
     }
 }
