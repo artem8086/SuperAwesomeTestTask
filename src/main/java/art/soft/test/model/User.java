@@ -86,7 +86,7 @@ public class User {
         ArrayList<Role> roles = new ArrayList<Role>();
         roles.add(Role.ROLE_CLIENT);
         if (isAdmin) {
-            roles.add(Role.ROLE_CLIENT);
+            roles.add(Role.ROLE_ADMIN);
         }
         return roles;
     }
