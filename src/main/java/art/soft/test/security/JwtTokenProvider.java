@@ -1,4 +1,4 @@
-package art.soft.test.config;
+package art.soft.test.security;
 
 import java.util.Base64;
 import java.util.Date;
@@ -35,8 +35,8 @@ public class JwtTokenProvider {
     @Value("${security.jwt.token.secret-key:secret-key}")
     private String secretKey;
 
-    @Value("${security.jwt.token.expire-length:3600000}")
-    private long validityInMilliseconds = 3600000; // 1h
+    //@Value("${security.jwt.token.expire-length:3600000}")
+    //private long validityInMilliseconds = 3600000; // 1h
 
     @Autowired
     private MyUserDetails myUserDetails;
@@ -52,12 +52,12 @@ public class JwtTokenProvider {
         //claims.put("auth", new SimpleGrantedAuthority(role));
 
         Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMilliseconds);
+        //Date validity = new Date(now.getTime() + validityInMilliseconds);
 
         return Jwts.builder()//
                 .setClaims(claims)//
                 .setIssuedAt(now)//
-                .setExpiration(validity)//
+                //.setExpiration(validity)//
                 .signWith(SignatureAlgorithm.HS256, secretKey)//
                 .compact();
     }

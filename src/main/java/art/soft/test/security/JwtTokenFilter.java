@@ -1,4 +1,4 @@
-package art.soft.test.config;
+package art.soft.test.security;
 
 import java.io.IOException;
 

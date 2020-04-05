@@ -1,4 +1,4 @@
-package art.soft.test.config;
+package art.soft.test.security;
 import art.soft.test.model.User;
 import art.soft.test.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

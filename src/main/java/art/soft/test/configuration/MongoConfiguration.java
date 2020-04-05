@@ -1,4 +1,4 @@
-package art.soft.test;
+package art.soft.test.configuration;
 
 import art.soft.test.model.Post;
 import art.soft.test.model.User;

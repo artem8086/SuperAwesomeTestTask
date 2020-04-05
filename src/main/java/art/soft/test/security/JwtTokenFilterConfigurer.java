@@ -1,4 +1,4 @@
-package art.soft.test.config;
+package art.soft.test.security;
 
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

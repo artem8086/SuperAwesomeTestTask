@@ -1,6 +1,6 @@
 package art.soft.test.service;
 
-import art.soft.test.config.JwtTokenProvider;
+import art.soft.test.security.JwtTokenProvider;
 import art.soft.test.exception.CustomException;
 import art.soft.test.model.*;
 import art.soft.test.repository.PostRepository;
