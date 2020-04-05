@@ -95,7 +95,7 @@ public class UserService {
         } catch (NoSuchElementException e) {}
         User user = userRepository.findByLogin(userId);
         if (user != null) return user;
-        throw new CustomException("The user [" + userId + "] doesn't exist", HttpStatus.NOT_FOUND);
+        throw new CustomException("User '" + userId + "' not found!", HttpStatus.NOT_FOUND);
     }
 
     public User whoami(HttpServletRequest req) {
@@ -111,7 +111,7 @@ public class UserService {
         if (userCur.getSubscribes().add(userSub)) {
             userRepository.save(userCur);
         } else {
-            throw new CustomException("You already subscribe on " + userSub.getLogin() + "!", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new CustomException("You already subscribe on '" + userSub.getLogin() + "'!", HttpStatus.UNPROCESSABLE_ENTITY);
         }
         return userSub;
     }
@@ -125,7 +125,7 @@ public class UserService {
         if (userCur.getSubscribes().remove(userSub)) {
             userRepository.save(userCur);
         } else {
-            throw new CustomException("You already unsubscribe at " + userSub.getLogin() + "!", HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new CustomException("You already unsubscribe at '" + userSub.getLogin() + "'!", HttpStatus.UNPROCESSABLE_ENTITY);
         }
         return userSub;
     }
