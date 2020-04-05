@@ -1,5 +1,6 @@
 package art.soft.test.service;
 
+import art.soft.test.repository.VerifyRepository;
 import art.soft.test.security.JwtTokenProvider;
 import art.soft.test.exception.CustomException;
 import art.soft.test.model.*;
@@ -28,6 +29,9 @@ public class UserService {
     private PostRepository postRepository;
 
     @Autowired
+    private VerifyRepository verifyRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -52,12 +56,24 @@ public class UserService {
         }
     }
 
-    public JwtToken signup(String login, String email, String password) {
+    public JwtToken confirm(String token) {
+        try {
+            VerificationToken verifyToken = verifyRepository.findById(token).get();
+            verifyRepository.delete(verifyToken);
+            User user = verifyToken.getUser();
+            user.setActive(true);
+            userRepository.save(user);
+            return new JwtToken(jwtTokenProvider.createToken(user.getLogin(), user.getRoles()));
+        } catch (Exception e) {
+            throw new CustomException("Confirm link not valid!", HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+    }
+
+    public VerificationToken signup(String login, String email, String password) {
         try {
             User user = new User(login, email, passwordEncoder.encode(password), false);
-            String token = jwtTokenProvider.createToken(login, user.getRoles());
             userRepository.insert(user);
-            return new JwtToken(token);
+            return verifyRepository.insert(new VerificationToken(user));
         } catch (DuplicateKeyException e) {
             throw new CustomException("Login or email already taken!", HttpStatus.UNPROCESSABLE_ENTITY);
         } catch (Exception e) {
@@ -124,6 +140,7 @@ public class UserService {
 
     public User delete(User user) {
         postRepository.deleteAll(postRepository.findByOwner(user));
+        verifyRepository.deleteAll(verifyRepository.findByUser(user));
         userRepository.delete(user);
         userRepository.findAll().forEach(u -> {
             if (u.getSubscribes().remove(user)) {

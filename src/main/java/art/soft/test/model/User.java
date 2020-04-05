@@ -26,7 +26,7 @@ public class User {
 
     private String password;
     private boolean isAdmin;
-    private boolean isActive = true;
+    private boolean isActive;
 
     @DBRef
     private Set<User> subscribes = new HashSet<User>();
