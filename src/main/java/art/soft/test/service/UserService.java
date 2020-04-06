@@ -1,5 +1,6 @@
 package art.soft.test.service;
 
+import art.soft.test.dto.UserDTO;
 import art.soft.test.repository.VerifyRepository;
 import art.soft.test.security.JwtTokenProvider;
 import art.soft.test.exception.CustomException;
@@ -69,9 +70,13 @@ public class UserService {
         }
     }
 
-    public VerificationToken signup(String login, String email, String password) {
+    public VerificationToken signup(UserDTO userDTO) {
         try {
-            User user = new User(login, email, passwordEncoder.encode(password), false);
+            User user = new User(
+                    userDTO.getLogin(),
+                    userDTO.getEmail(),
+                    passwordEncoder.encode(userDTO.getPassword()),
+                    false);
             userRepository.insert(user);
             return verifyRepository.insert(new VerificationToken(user));
         } catch (DuplicateKeyException e) {
@@ -130,11 +135,11 @@ public class UserService {
         return userSub;
     }
 
-    public User modify(User user, String login, String email, String password, Boolean active) {
-        if (login != null) user.setLogin(login);
-        if (email != null) user.setEmail(email);
-        if (password != null) user.setPassword(passwordEncoder.encode(password));
-        if (active != null) user.setActive(active);
+    public User modify(User user, UserDTO userDTO) {
+        if (userDTO.getLogin() != null) user.setLogin(userDTO.getLogin());
+        if (userDTO.getEmail() != null) user.setEmail(userDTO.getEmail());
+        if (userDTO.getPassword() != null) user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        if (userDTO.getActive() != null) user.setActive(userDTO.getActive());
         return userRepository.save(user);
     }
 

@@ -1,5 +1,6 @@
 package art.soft.test.controller;
 
+import art.soft.test.dto.PostDTO;
 import art.soft.test.model.Post;
 import art.soft.test.model.User;
 import art.soft.test.service.PostService;
@@ -22,18 +23,13 @@ public class PostController {
     private PostService postService;
 
     @PostMapping("/create")
-    public Post create(HttpServletRequest req,
-                       @RequestParam String title,
-                       @RequestParam String content) {
-        return postService.create(userService.whoami(req), title, content);
+    public Post create(HttpServletRequest req, @RequestBody PostDTO post) {
+        return postService.create(userService.whoami(req), post);
     }
 
     @PostMapping("/modify/{postid}")
-    public Post modify(HttpServletRequest req,
-                       @PathVariable String postid,
-                       @RequestParam(required = false) String title,
-                       @RequestParam(required = false) String content) {
-        return postService.modify(userService.whoami(req), postid, title, content);
+    public Post modify(HttpServletRequest req, @PathVariable String postid, @RequestBody PostDTO post) {
+        return postService.modify(userService.whoami(req), postid, post);
     }
 
     @PostMapping("/delete/{postid}")

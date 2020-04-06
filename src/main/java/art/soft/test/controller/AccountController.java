@@ -1,13 +1,11 @@
 package art.soft.test.controller;
 
+import art.soft.test.dto.UserDTO;
 import art.soft.test.model.JwtToken;
 import art.soft.test.model.VerificationToken;
 import art.soft.test.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
@@ -22,11 +20,8 @@ public class AccountController {
     }
 
     @PostMapping("/signup")
-    public String signup(UriComponentsBuilder builder,
-                      @RequestParam String login,
-                      @RequestParam String email,
-                      @RequestParam String password) {
-        VerificationToken token = userService.signup(login, email, password);
+    public String signup(UriComponentsBuilder builder, @RequestBody UserDTO user) {
+        VerificationToken token = userService.signup(user);
         return builder.path("/account/confirm").query("token={token}").buildAndExpand(token.getToken()).toUri().toString();
     }
 

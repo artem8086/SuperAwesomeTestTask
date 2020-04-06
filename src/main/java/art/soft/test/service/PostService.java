@@ -1,5 +1,6 @@
 package art.soft.test.service;
 
+import art.soft.test.dto.PostDTO;
 import art.soft.test.exception.CustomException;
 import art.soft.test.model.Post;
 import art.soft.test.repository.PostRepository;
@@ -18,11 +19,11 @@ public class PostService {
     @Autowired
     private PostRepository postRepository;
 
-    public Post create(User user, String title, String content) {
-        return postRepository.insert(new Post(title, content, user));
+    public Post create(User user, PostDTO postDTO) {
+        return postRepository.insert(new Post(postDTO.getTitle(), postDTO.getContent(), user));
     }
 
-    public Post modify(User user, String id, String title, String content) {
+    public Post modify(User user, String id, PostDTO postDTO) {
         Post post;
         try {
             post = postRepository.findById(id).get();
@@ -32,8 +33,8 @@ public class PostService {
         if (!user.isAdmin() && !post.getOwner().equals(user)) {
             throw new CustomException("This post doesn't belong to you!", HttpStatus.UNPROCESSABLE_ENTITY);
         }
-        if (title != null) post.setTitle(title);
-        if (content != null) post.setContent(content);
+        if (postDTO.getTitle() != null) post.setTitle(postDTO.getTitle());
+        if (postDTO.getContent() != null) post.setContent(postDTO.getContent());
         postRepository.save(post);
         return post;
     }

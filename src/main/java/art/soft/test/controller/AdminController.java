@@ -1,5 +1,6 @@
 package art.soft.test.controller;
 
+import art.soft.test.dto.UserDTO;
 import art.soft.test.model.User;
 import art.soft.test.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +28,8 @@ public class AdminController {
     }
 
     @PostMapping("/modify/{userid}")
-    public User modify(@PathVariable String userid,
-                       @RequestParam(required = false) String login,
-                       @RequestParam(required = false) String email,
-                       @RequestParam(required = false) String password,
-                       @RequestParam(required = false) Boolean active) {
-        return userService.modify(userService.search(userid), login, email, password, active);
+    public User modify(@PathVariable String userid, @RequestBody UserDTO user) {
+        return userService.modify(userService.search(userid), user);
     }
 
     @PostMapping("/delete/{userid}")
