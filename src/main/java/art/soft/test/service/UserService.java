@@ -41,17 +41,17 @@ public class UserService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    public JwtToken signin(String login, String password) {
+    public JwtToken signin(UserDTO userDTO) {
         try {
-            User user = userRepository.findByLogin(login);
+            User user = userRepository.findByLogin(userDTO.getLogin());
             if (user == null) {
                 throw new CustomException("User not found!", HttpStatus.NOT_FOUND);
             }
             if (!user.isActive()) {
                 throw new CustomException("User is inactive!", HttpStatus.UNPROCESSABLE_ENTITY);
             }
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(login, password));
-            return new JwtToken(jwtTokenProvider.createToken(login, user.getRoles()));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDTO.getLogin(), userDTO.getPassword()));
+            return new JwtToken(jwtTokenProvider.createToken(userDTO.getLogin(), user.getRoles()));
         } catch (AuthenticationException e) {
             throw new CustomException("Invalid login or password supplied", HttpStatus.UNPROCESSABLE_ENTITY);
         }

@@ -15,8 +15,8 @@ public class AccountController {
     private UserService userService;
 
     @PostMapping("/signin")
-    public JwtToken signin(@RequestParam String login, @RequestParam String password) {
-        return userService.signin(login, password);
+    public JwtToken signin(@RequestBody UserDTO user) {
+        return userService.signin(user);
     }
 
     @PostMapping("/signup")
