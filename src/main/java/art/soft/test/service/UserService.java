@@ -1,7 +1,6 @@
 package art.soft.test.service;
 
 import art.soft.test.dto.UserDTO;
-import art.soft.test.repository.VerifyRepository;
 import art.soft.test.security.JwtTokenProvider;
 import art.soft.test.exception.CustomException;
 import art.soft.test.model.*;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,9 +28,6 @@ public class UserService {
 
     @Autowired
     private PostRepository postRepository;
-
-    @Autowired
-    private VerifyRepository verifyRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -59,9 +56,8 @@ public class UserService {
 
     public JwtToken confirm(String token) {
         try {
-            VerificationToken verifyToken = verifyRepository.findById(token).get();
-            verifyRepository.delete(verifyToken);
-            User user = verifyToken.getUser();
+            User user = userRepository.findByToken(token);
+            user.setToken(null);
             user.setActive(true);
             userRepository.save(user);
             return new JwtToken(jwtTokenProvider.createToken(user.getLogin(), user.getRoles()));
@@ -70,15 +66,22 @@ public class UserService {
         }
     }
 
-    public VerificationToken signup(UserDTO userDTO) {
+    private String genereteToken(User user) {
+        return passwordEncoder.encode(user.getId() + ":" + UUID.randomUUID());
+    }
+
+    public String signup(UserDTO userDTO) {
+        User user = new User(
+            userDTO.getLogin(),
+            userDTO.getEmail(),
+            passwordEncoder.encode(userDTO.getPassword()),
+            false);
         try {
-            User user = new User(
-                    userDTO.getLogin(),
-                    userDTO.getEmail(),
-                    passwordEncoder.encode(userDTO.getPassword()),
-                    false);
             userRepository.insert(user);
-            return verifyRepository.insert(new VerificationToken(user));
+            String token = genereteToken(user);
+            user.setToken(token);
+            userRepository.save(user);
+            return token;
         } catch (DuplicateKeyException e) {
             throw new CustomException("Login or email already taken!", HttpStatus.UNPROCESSABLE_ENTITY);
         } catch (Exception e) {
@@ -145,7 +148,6 @@ public class UserService {
 
     public User delete(User user) {
         postRepository.deleteAll(postRepository.findByOwner(user));
-        verifyRepository.deleteAll(verifyRepository.findByUser(user));
         userRepository.delete(user);
         userRepository.findAll().forEach(u -> {
             if (u.getSubscribes().remove(user)) {

@@ -1,11 +1,13 @@
 package art.soft.test.model;
 
+import art.soft.test.exception.CustomException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.http.HttpStatus;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,9 +33,14 @@ public class User {
     @DBRef
     private Set<User> subscribes = new HashSet<User>();
 
+    private String token;
+
     public User() {}
 
     public User(String login, String email, String password, boolean isAdmin) {
+        if (login == null) throw new CustomException("User login is required!", HttpStatus.UNPROCESSABLE_ENTITY);
+        if (email == null) throw new CustomException("User email is required!", HttpStatus.UNPROCESSABLE_ENTITY);
+        if (password == null) throw new CustomException("User password is required!", HttpStatus.UNPROCESSABLE_ENTITY);
         this.login = login;
         this.email = email;
         this.password = password;
@@ -103,6 +110,15 @@ public class User {
 
     public List<String> getSubs() {
         return subscribes.stream().map(u -> u.login).collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     @Override
